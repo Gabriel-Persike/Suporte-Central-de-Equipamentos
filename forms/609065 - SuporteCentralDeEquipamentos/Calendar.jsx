@@ -1,7 +1,6 @@
 class Calendario extends React.Component {
     constructor(props) {
         super(props);
-        console.log("Constructor");
         this.state = {
             calendario: [
                 this.getDays("09:00"), //09:00
@@ -10,8 +9,7 @@ class Calendario extends React.Component {
                 this.getDays("13:00"), //13:00
                 this.getDays("14:00"), //14:00
                 this.getDays("15:00"), //15:00
-                this.getDays("16:00"), //16:00
-                this.getDays("17:00") //17:00
+                this.getDays("16:00")
             ],
             agendado: {
                 dia: "",
@@ -102,94 +100,140 @@ class Calendario extends React.Component {
         });
     }
 
-    handleClick(i, j) {
+    handleClick(Dia, Horario) {
         var calendario = this.state.calendario.slice();
 
-        if (!calendario[j][i].curso && !calendario[j][i].solicitante && !calendario[j][i].obra && $("#categoria").val() != "Cancelamento de Curso / Orientação") {
-            if ($("#atividade").val() != 0 && $("#atividade").val() != 4) {
-                return;
-            } else if (i == 0) {
-                FLUIGC.toast({
-                    message: "Necessário agendar com 24h de antecedência!",
-                    type: "warning"
-                });
-            } else if (this.validaPreenchimentoParaSelecionarAgendamento()) {
-                var curso = $("#curso").val();
-                var obra = $("#obra").val();
-                var usuarios = [];
-                $("#tableUsuariosCurso>tbody")
-                    .find("tr")
-                    .each(function () {
-                        usuarios.push({
-                            nome: $(this).find(".nomeUsuario").val(),
-                            email: $(this).find(".emailusuario").val(),
-                            telefone: $(this).find(".telefoneUsuario").val()
-                        });
-                    });
-                calendario[j][i].curso = curso;
-                calendario[j][i].solicitante = BuscaNomeUsuario($("#solicitante").val());
-                calendario[j][i].obra = obra;
-                calendario[j][i].status = 3;
-                calendario[j][i].usuarios = usuarios;
-
-                if (this.state.agendado.dia != "") {
-                    calendario[this.state.agendado.horario][this.state.agendado.dia].curso = "";
-                    calendario[this.state.agendado.horario][this.state.agendado.dia].solicitante = "";
-                    calendario[this.state.agendado.horario][this.state.agendado.dia].obra = "";
-                    calendario[this.state.agendado.horario][this.state.agendado.dia].status = "";
-                }
-                var agendado = {
-                    dia: i,
-                    horario: j
-                };
-
-                this.setState({
-                    calendario: calendario,
-                    agendado: agendado
-                });
-
-                $("#inputCursoDiaAgendado").val(FormataDataSQL(calendario[j][i].dia));
-                $("#inputCursoHorarioAgendado").val(calendario[j][i].horario);
-                $("#spanHeaderAgendamento").text(calendario[j][i].dia + " - " + calendario[j][i].horario);
-            }
-        } else if (calendario[j][i].curso && calendario[j][i].solicitante && calendario[j][i].obra) {
-            if (this.state.agendado.dia == i && this.state.agendado.horario == j && ($("#atividade").val() == 0 || $("#atividade").val() == 4)) {
-                var usuarios = [];
-                $("#tableUsuariosCurso>tbody")
-                    .find("tr")
-                    .each(function () {
-                        usuarios.push({
-                            nome: $(this).find(".nomeUsuario").val(),
-                            email: $(this).find(".emailusuario").val(),
-                            telefone: $(this).find(".telefoneUsuario").val()
-                        });
-                    });
-
-                this.state.calendario[j][i].usuarios = usuarios;
-            }
-
-            var myModal = FLUIGC.modal(
-                {
-                    title: calendario[j][i].curso + " - " + calendario[j][i].dia + " " + calendario[j][i].horario,
-                    content: "<div id='rootModal'></div>",
-                    size: "full",
-                    id: "fluig-modal",
-                    actions: [
-                        {
-                            label: "Fechar",
-                            autoClose: true
-                        }
-                    ]
-                },
-                function (err, data) {
-                    if (err) {
-                    } else {
-                        modalRoot = ReactDOM.createRoot(document.querySelector("#rootModal"));
-                        modalRoot.render(React.createElement(ModalAgendamento, { Agendamento: calendario[j][i] }));
-                    }
-                }
-            );
+        if (!calendario[Horario][Dia].curso && !calendario[Horario][Dia].solicitante && !calendario[Horario][Dia].obra && $("#categoria").val() == "Agendamento de Curso / Orientação") {
+            this.SelecionaDataEHorario(Dia, Horario);
+        } else if (calendario[Horario][Dia].curso && calendario[Horario][Dia].solicitante && calendario[Horario][Dia].obra) {
+            this.MostraInfosAgendamento(Dia, Horario);
         }
+    }
+
+    MostraInfosAgendamento(Dia, Horario){
+        var calendario = this.state.calendario.slice();
+
+        if (this.state.agendado.dia == Dia && this.state.agendado.horario == Horario && ($("#atividade").val() == 0 || $("#atividade").val() == 4)) {
+            this.state.calendario[Horario][Dia].usuarios = MontaListaDeUsuariosQueParticiparaoDoCurso();
+        }
+
+        var myModal = FLUIGC.modal(
+            {
+                title: calendario[Horario][Dia].curso + " - " + calendario[Horario][Dia].dia + " " + calendario[Horario][Dia].horario,
+                content: "<div id='rootModal'></div>",
+                size: "full",
+                id: "fluig-modal",
+                actions: [
+                    {
+                        label: "Fechar",
+                        autoClose: true
+                    }
+                ]
+            },
+            function (err, data) {
+                if (err) {
+                } else {
+                    modalRoot = ReactDOM.createRoot(document.querySelector("#rootModal"));
+                    modalRoot.render(React.createElement(ModalAgendamento, { Agendamento: calendario[Horario][Dia] }));
+                }
+            }
+        );
+    }
+
+    SelecionaDataEHorario(Dia, Horario) {
+        var calendario = this.state.calendario.slice();
+
+        //Se a Data e Horario selecionados não tem agendamento e também a Categoria tem que ser Agendamento
+        if ($("#atividade").val() != 0 && $("#atividade").val() != 4) {
+            //Caso não esteja na atividade que seleciona a Data e Horário nao acontece nada
+            return;
+        }
+        else if (!this.DataEHorarioRespeita24HorasAntesDoChamado(Dia, Horario)) {
+            FLUIGC.toast({
+                message: "Necessário agendar com 24h de antecedência!",
+                type: "warning"
+            });
+        }
+        else if (this.validaPreenchimentoParaSelecionarAgendamento()) {
+            calendario = this.RemoveAgendamentoDaDataAnteriorCasoSejaSelecionadaOutraData(calendario,Dia, Horario);
+            calendario = this.AgendaCursoNaDataEHorarioDentroDoState(calendario, Dia, Horario);
+            console.log(calendario)
+            var agendado = {
+                dia: Dia,
+                horario: Horario
+            };
+
+            this.setState({
+                calendario: calendario,
+                agendado: agendado
+            });
+
+            $("#inputCursoDiaAgendado").val(FormataDataSQL(calendario[Horario][Dia].dia));
+            $("#inputCursoHorarioAgendado").val(calendario[Horario][Dia].horario);
+            $("#spanHeaderAgendamento").text(calendario[Horario][Dia].dia + " - " + calendario[Horario][Dia].horario);
+        }
+    }
+
+    DataEHorarioRespeita24HorasAntesDoChamado(Dia, Horario) {
+        if (Dia < 1) {
+            //Se dia for menor que 1 significa que o Dia selecionado é hoje, portanto não respeita 24h de antecedencia
+            return false;
+        }
+        else if (Dia == 1) {
+            //Se dia for igual a 1 significa que o Dia selecionado é amanhã, portanto é necessario verificar o horario
+            var calendario = this.state.calendario.slice();
+            var now = new Date();
+            var horaNow = now.getHours();
+            var minutoNow = now.getMinutes();
+            var [HorarioSelecionado, MinutosSelecionado] = calendario[Horario][Dia].horario.split(":");
+
+            if (HorarioSelecionado < horaNow || (HorarioSelecionado == horaNow && MinutosSelecionado < minutoNow)) {
+                return false;
+            }
+            else {
+                return true;
+            }
+        }
+        else {
+            return true;
+        }
+    }
+
+    AgendaCursoNaDataEHorarioDentroDoState(calendario, Dia, Horario) {
+        var curso = $("#curso").val();
+        var obra = $("#obra").val();
+
+        calendario[Horario][Dia].curso = curso;
+        calendario[Horario][Dia].solicitante = BuscaNomeUsuario($("#solicitante").val());
+        calendario[Horario][Dia].obra = obra;
+        calendario[Horario][Dia].status = 3;
+        calendario[Horario][Dia].usuarios = this.MontaListaDeUsuariosQueParticiparaoDoCurso();
+
+        return calendario;
+    }
+
+    RemoveAgendamentoDaDataAnteriorCasoSejaSelecionadaOutraData(calendario) {
+        if (this.state.agendado.dia != "") {
+            calendario[this.state.agendado.horario][this.state.agendado.dia].curso = "";
+            calendario[this.state.agendado.horario][this.state.agendado.dia].solicitante = "";
+            calendario[this.state.agendado.horario][this.state.agendado.dia].obra = "";
+            calendario[this.state.agendado.horario][this.state.agendado.dia].status = "";
+        }
+        return calendario;
+    }
+
+    MontaListaDeUsuariosQueParticiparaoDoCurso() {
+        var usuarios = [];
+        $("#tableUsuariosCurso>tbody")
+            .find("tr")
+            .each(function () {
+                usuarios.push({
+                    nome: $(this).find(".nomeUsuario").val(),
+                    email: $(this).find(".emailusuario").val(),
+                    telefone: $(this).find(".telefoneUsuario").val()
+                });
+            });
+        return usuarios;
     }
 
     getDays(horario) {
@@ -220,9 +264,7 @@ class Calendario extends React.Component {
         dia = dia.getFullYear() + "-" + (dia.getMonth() + 1) + "-" + dia.getDate();
         DatasetFactory.getDataset("AgendamentoCursosCentral", null, [DatasetFactory.createConstraint("operacao", "Select", "Select", ConstraintType.MUST), DatasetFactory.createConstraint("dia", dia, dia, ConstraintType.MUST), DatasetFactory.createConstraint("WKNumProces", $("#numProces").val() != "" ? $("#numProces").val() : 0, $("#numProces").val() != "" ? $("#numProces").val() : 0, ConstraintType.MUST)], null, {
             success: (ds, atualizacalendario = this.atualizaCalendario) => {
-
                 atualizacalendario(ds);
-             
             }
         });
     }
@@ -306,7 +348,7 @@ class Calendario extends React.Component {
     }
 
     atualizaCalendario(agendamentos) {
-        var horarios = ["09:00", "10:00", "11:00", "13:00", "14:00", "15:00", "16:00", "17:00"];
+        var horarios = ["09:00", "10:00", "11:00", "13:00", "14:00", "15:00", "16:00"];
         var calendario = this.state.calendario.slice();
 
         agendamentos.values.forEach((agendamento) => {
@@ -347,8 +389,6 @@ class Calendario extends React.Component {
         this.setState({
             calendario: calendario
         });
-
-
     }
 
     render() {
