@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <link rel="stylesheet" type="text/css" href="/style-guide/css/fluig-style-guide.min.css" />
+        <script src="/resources/js/jquery/jquery.js"></script>
+        <script src="/resources/js/jquery/jquery-ui.min.js"></script>
+        <script src="/resources/js/mustache/mustache-min.js"></script>
+        <script src="/style-guide/js/fluig-style-guide.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.mask/1.14.16/jquery.mask.min.js"></script>
+        <link rel="stylesheet" href="Style.css" />
+        <script src="/webdesk/vcXMLRPC.js"></script>
+        <script src="https://unpkg.com/react@18/umd/react.development.js" crossorigin></script>
+        <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js" crossorigin></script>
+        <script src="https://unpkg.com/babel-standalone@6/babel.min.js"></script>
+        <script src="Calendar.jsx" type="text/babel"></script>
+        <script src="Functions.js"></script>
+        <script src="Script.js"></script>
+    </head>
+
+    <body class="fluig-style-guide">
+        <form name="form" role="form">
+            <div id="divCollapse">
+                <ul id="coltabs" class="nav nav-tabs nav-justified nav-pills" role="tablist" style="padding-bottom: 0px; width: 100%">
+                    <li class="collapse-tab active">
+                        <a href="#tabInfoChamado" role="tab" id="atabInfoChamado" data-toggle="tab" aria-expanded="true" class="tab">Informações do Chamado</a>
+                    </li>
+                    <li class="collapse-tab">
+                        <a href="#tabHistorico" role="tab" id="atabHistorico" data-toggle="tab" aria-expanded="true" class="tab">Histórico</a>
+                    </li>
+                </ul>
+                <div class="tab-content">
+                    <div class="tab-pane active" id="tabInfoChamado">
+                        <!--
+					<div style="border: red 1px solid; width: 100%; text-align: center; color: red;" id="divComunicado">
+					</div>
+					<br>
+					-->
+                        <div class="form-input">
+                            <label>Categoria:</label>
+                            <strong class="strongAlert">*</strong>
+                            <select name="categoria" id="categoria" class="form-control inputInfoChamado">
+                                <option value=""></option>
+                                <option value="Agendamento de Curso / Orientação">Agendamento de Curso / Orientação</option>
+                            </select>
+                            <div></div>
+                            <br />
+                        </div>
+                        <div id="divCamposCursos">
+                            <div class="form-input">
+                                <label>Curso:</label>
+                                <strong class="strongAlert">*</strong>
+                                <select name="curso" id="curso" class="form-control inputCurso">
+                                    <option value=""></option>
+									<optgroup label="Mobile">
+										<option value="Mobile - Abastecimentos">Abastecimentos</option>
+										<option value="Mobile - Checklist">Checklist</option>
+									</optgroup>
+									<optgroup label="PC">
+										<option value="PC - Abastecimentos Frota">Abastecimentos Frota</option>
+										<option value="PC - Compra de Peças">Compra de Peças</option>
+										<option value="PC - Compra de Diesel, Óleo de Queima">Compra de Diesel, Óleo de Queima</option>
+										<option value="PC - Checklist dos Equipamentos">Checklist dos Equipamentos</option>
+										<option value="PC - Medições de Maquinas Alugadas (MA)">Medições de Maquinas Alugadas (MA)</option>
+									</optgroup>
+                                </select>
+                                <div></div>
+                                <br />
+                            </div>
+                            <div class="form-input">
+                                <label>Obra:</label>
+                                <strong class="strongAlert">*</strong>
+                                <select name="obra" id="obra" class="form-control inputCurso">
+                                 </select>
+                                <div></div>
+                                <br />
+                            </div>                        
+                            <div class="form-input">
+                                <label>Usuários:</label>
+								<strong class="strongAlert">*</strong>
+                                <button class="btn btn-primary" id="btnAdicionarLinhaUsuariosCurso">Adicionar</button>
+                                <table class="table table-bordered" id="tableUsuariosCurso">
+                                    <thead>
+                                        <tr>
+                                            <th>Usuário</th>
+                                            <th>E-mail para Contato <small>(opcional)</small></th>
+                                            <th>Telefone para Contato <small>(opcional)</small></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody></tbody>
+                                </table>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div id="calendar"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div id="divCancelamentoCurso">
+
+                        </div>
+                        <br />
+                        <div class="form-input">
+                            <label>
+                                Observação:
+                            </label>
+                            <textarea name="observacaoAgendamentoCurso" id="observacaoAgendamentoCurso" class="form-control inputCurso inputOpcional" rows="4"></textarea>
+                            <div></div>
+                            <br />
+                        </div>
+                        <div class="form-input">
+                            <label>
+                                Enviar cópia para:
+                                <i class="flaticon flaticon-info icon-sm" data-toggle="tooltip" data-placement="top" title="Endereços de e-mail incluidos na notificação enviada por e-mail. (Separados por ;)"></i>
+                            </label>
+                            <input type="text" class="form-control" name="email" id="email" />
+                            <br />
+                        </div>
+                    </div>
+                    <div class="tab-pane" id="tabHistorico">
+                        <div id="divHistorico"></div>
+                    </div>
+                </div>
+            </div>
+            <br />
+            <div id="divResolucaoChamado" class="panel panel-primary">
+                <div class="panel-heading">
+                    <h3 class="panel-title">Resolução</h3>
+                </div>
+                <div class="panel-body">
+                    <div id="divDecisao">
+                        <div class="form-input form-input-checkbox">
+                            <input type="radio" name="decisao" id="decisaoEnviar" value="Enviar" class="radioDecisao" />
+                            <label for="decisaoEnviar">Encerrar</label>
+                        </div>
+                        <div class="form-input form-input-checkbox">
+                            <input type="radio" name="decisao" id="decisaoRetornar" value="Retornar" class="radioDecisao" />
+                            <label for="decisaoRetornar">Retornar</label>
+                        </div>
+                    </div>
+                    <div id="divInfoResolucaoChamado">
+                        <div class="form-input">
+                            <label>Responsável:</label>
+                            <select name="responsavelCurso" id="responsavelCurso" class="form-control" style="width: 50%;">
+
+                            </select>
+                            <br />
+                        </div>
+                        <div class="form-input">
+                            <label>Solução:</label>
+                            <textarea name="solucao" id="solucao" class="form-control inputResolucaoChamado" rows="3" placeholder="Informe a solução encontrada"></textarea>
+                            <div></div>
+                        </div>
+                    </div>
+                    <div id="divInfoObservacao">
+                        <div class="form-input">
+                            <label>Prazo de retorno:</label>
+                            <input type="text" id="data_prazo_retorno" name="data_prazo_retorno" class="form-control inputObservacao" />
+                            <div></div>
+                            <br />
+                        </div>
+                        <div class="form-input">
+                            <label>Observação:</label>
+                            <textarea name="observacao" id="observacao" class="form-control inputObservacao" rows="3"></textarea>
+                            <div></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="hidden" style="display: none">
+                <input type="hidden" id="solicitante" name="solicitante" />
+                <input type="hidden" id="atendimento" name="atendimento" />
+                <input type="hidden" id="atividade" name="atividade" />
+                <input type="hidden" id="formMode" name="formMode" />
+                <input type="hidden" id="numProces" name="numProces" />
+                <input type="hidden" id="userCode" name="userCode" />
+                <input type="hidden" name="obraHidden" id="obraHidden">
+                <input type="hidden" name="responsavelHidden" id="responsavelHidden">
+                <input type="hidden" name="inputCursoDiaAgendado" id="inputCursoDiaAgendado">
+                <input type="hidden" name="inputCursoHorarioAgendado" id="inputCursoHorarioAgendado">
+                <input type="hidden" name="inputCursoUsuariosJSON" id="inputCursoUsuariosJSON">
+                <input type="hidden" name="solicitacaoCancelamentoCurso" id="solicitacaoCancelamentoCurso">
+            </div>
+
+            <script>
+                var beforeSendValidate = function (numState, nextState) {
+                    return ValidaCampos();
+                };
+            </script>
+        </form>
+    </body>
+</html>

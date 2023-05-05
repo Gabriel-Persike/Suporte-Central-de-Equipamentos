@@ -1,0 +1,110 @@
+.has-error{
+    padding-top: 0px !important;
+    padding-bottom: 0px !important;
+    padding-left: 2px !important;
+    padding-right: 2px !important;
+    display: inline-block;
+    border: 1px red solid !important;
+    color: black !important;
+}
+
+.strongAlert{
+    color: red;
+}
+
+.form-input-checkbox{
+    margin-right: 15px;
+    display: inline-block;
+}
+
+#divDecisao, #divDecisaoConclusao{
+    text-align: center;
+}
+
+
+.tab{ 
+    border: black 1px solid !important;
+    border-radius: 4px 4px 0 0 !important;
+}
+
+.fluig-style-guide .nav-tabs.nav-justified>li.in>a {
+    background-color: #58595b;
+    color: #fff;
+}
+
+.tab-content{
+    border: black solid 1px; 
+    width: fit-content; 
+    min-width: 100%;
+}
+
+textarea{
+    resize: vertical;
+}
+
+#btnAdicionarLinhaUsuariosCurso{
+    float: right;
+}
+
+.tab-content{
+    width: 100% !important;
+}
+
+table{
+    border-collapse: separate !important;
+
+}
+
+.modal-body{
+    max-height: 65vh !important;
+}
+
+
+
+
+@media screen and (max-width: 600px) {
+	#tableUsuariosCurso {
+		border: 0;
+	}
+	#tableUsuariosCurso caption {
+		font-size: 1.3em;
+	}
+	#tableUsuariosCurso thead {
+		border: none;
+		clip: rect(0 0 0 0);
+		height: 1px;
+		margin: -1px;
+		overflow: hidden;
+		padding: 0;
+		position: absolute;
+		width: 1px;
+	}
+	#tableUsuariosCurso tr {
+		border-bottom: 3px solid #ddd;
+		display: block;
+		margin-bottom: .625em;
+	}
+	#tableUsuariosCurso td {
+		border-bottom: 1px solid #ddd;
+		display: block;
+		font-size: .8em;
+		text-align: right;
+	}
+	#tableUsuariosCurso td::before {
+		/*
+	  * aria-label has no advantage, it won't be read inside a table
+	  content: attr(aria-label);
+	  */
+		content: attr(data-label);
+		float: left;
+		font-weight: bold;
+		text-transform: uppercase;
+	}
+	#tableUsuariosCurso td:last-child {
+		border-bottom: 0;
+	}
+
+	#tableUsuariosCurso>tbody>tr>td:nth-of-type(1):before { content: "Usuário"; }
+	#tableUsuariosCurso>tbody>tr>td:nth-of-type(2):before { content: "E-mail para Contato (opcional)"; }
+	#tableUsuariosCurso>tbody>tr>td:nth-of-type(3):before { content: "Telefone para Contato (opcional)"; }
+}
